@@ -4588,7 +4588,8 @@ STATIC const mp_obj_type_t mp_LV_THEME_type = {
 STATIC const mp_rom_map_elem_t LV_THEME_MATERIAL_FLAG_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_DARK), MP_ROM_PTR(MP_ROM_INT(LV_THEME_MATERIAL_FLAG_DARK)) },
     { MP_ROM_QSTR(MP_QSTR_LIGHT), MP_ROM_PTR(MP_ROM_INT(LV_THEME_MATERIAL_FLAG_LIGHT)) },
-    { MP_ROM_QSTR(MP_QSTR_NO_TRANSITION), MP_ROM_PTR(MP_ROM_INT(LV_THEME_MATERIAL_FLAG_NO_TRANSITION)) }
+    { MP_ROM_QSTR(MP_QSTR_NO_TRANSITION), MP_ROM_PTR(MP_ROM_INT(LV_THEME_MATERIAL_FLAG_NO_TRANSITION)) },
+    { MP_ROM_QSTR(MP_QSTR_NO_FOCUS), MP_ROM_PTR(MP_ROM_INT(LV_THEME_MATERIAL_FLAG_NO_FOCUS)) }
 };
 
 STATIC MP_DEFINE_CONST_DICT(LV_THEME_MATERIAL_FLAG_locals_dict, LV_THEME_MATERIAL_FLAG_locals_dict_table);
@@ -6948,6 +6949,8 @@ STATIC void mp_lv_font_t_attr(mp_obj_t self_in, qstr attr, mp_obj_t *dest)
             case MP_QSTR_line_height: dest[0] = mp_obj_new_int(data->line_height); break; // converting from lv_coord_t;
             case MP_QSTR_base_line: dest[0] = mp_obj_new_int(data->base_line); break; // converting from lv_coord_t;
             case MP_QSTR_subpx: dest[0] = mp_obj_new_int_from_uint(data->subpx); break; // converting from uint8_t;
+            case MP_QSTR_underline_position: dest[0] = mp_obj_new_int(data->underline_position); break; // converting from int8_t;
+            case MP_QSTR_underline_thickness: dest[0] = mp_obj_new_int(data->underline_thickness); break; // converting from int8_t;
             case MP_QSTR_dsc: dest[0] = ptr_to_mp((void*)data->dsc); break; // converting from void *;
             case MP_QSTR_user_data: dest[0] = ptr_to_mp(data->user_data); break; // converting from lv_font_user_data_t;
             default: call_parent_methods(self_in, attr, dest); // fallback to locals_dict lookup
@@ -6963,6 +6966,8 @@ STATIC void mp_lv_font_t_attr(mp_obj_t self_in, qstr attr, mp_obj_t *dest)
                 case MP_QSTR_line_height: data->line_height = (int16_t)mp_obj_get_int(dest[1]); break; // converting to lv_coord_t;
                 case MP_QSTR_base_line: data->base_line = (int16_t)mp_obj_get_int(dest[1]); break; // converting to lv_coord_t;
                 case MP_QSTR_subpx: data->subpx = (uint8_t)mp_obj_get_int(dest[1]); break; // converting to uint8_t;
+                case MP_QSTR_underline_position: data->underline_position = (int8_t)mp_obj_get_int(dest[1]); break; // converting to int8_t;
+                case MP_QSTR_underline_thickness: data->underline_thickness = (int8_t)mp_obj_get_int(dest[1]); break; // converting to int8_t;
                 case MP_QSTR_dsc: data->dsc = (void*)mp_to_ptr(dest[1]); break; // converting to void *;
                 case MP_QSTR_user_data: data->user_data = mp_to_ptr(dest[1]); break; // converting to lv_font_user_data_t;
                 default: return;
@@ -19640,18 +19645,18 @@ STATIC const mp_obj_type_t mp_roller_type = {
 
 /*
  * lvgl extension definition for:
- * inline static void lv_textarea_set_sscrollbar_mode(lv_obj_t *ta, lv_scrollbar_mode_t mode)
+ * inline static void lv_textarea_set_scrollbar_mode(lv_obj_t *ta, lv_scrollbar_mode_t mode)
  */
  
-STATIC mp_obj_t mp_lv_textarea_set_sscrollbar_mode(size_t mp_n_args, const mp_obj_t *mp_args)
+STATIC mp_obj_t mp_lv_textarea_set_scrollbar_mode(size_t mp_n_args, const mp_obj_t *mp_args)
 {
     lv_obj_t *ta = mp_to_lv(mp_args[0]);
     lv_scrollbar_mode_t mode = (uint8_t)mp_obj_get_int(mp_args[1]);
-    lv_textarea_set_sscrollbar_mode(ta, mode);
+    lv_textarea_set_scrollbar_mode(ta, mode);
     return mp_const_none;
 }
 
-STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_textarea_set_sscrollbar_mode_obj, 2, mp_lv_textarea_set_sscrollbar_mode, lv_textarea_set_sscrollbar_mode);
+STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_textarea_set_scrollbar_mode_obj, 2, mp_lv_textarea_set_scrollbar_mode, lv_textarea_set_scrollbar_mode);
 
  
 
@@ -20351,7 +20356,7 @@ STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_textarea_cursor_up_obj, 1, mp_lv_tex
     
 
 STATIC const mp_rom_map_elem_t textarea_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_set_sscrollbar_mode), MP_ROM_PTR(&mp_lv_textarea_set_sscrollbar_mode_obj) },
+    { MP_ROM_QSTR(MP_QSTR_set_scrollbar_mode), MP_ROM_PTR(&mp_lv_textarea_set_scrollbar_mode_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_scroll_propagation), MP_ROM_PTR(&mp_lv_textarea_set_scroll_propagation_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_edge_flash), MP_ROM_PTR(&mp_lv_textarea_set_edge_flash_obj) },
     { MP_ROM_QSTR(MP_QSTR_get_scrollbar_mode), MP_ROM_PTR(&mp_lv_textarea_get_scrollbar_mode_obj) },
@@ -21334,6 +21339,24 @@ STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_tabview_set_tab_act_obj, 3, mp_lv_ta
 
 /*
  * lvgl extension definition for:
+ * void lv_tabview_set_tab_name(lv_obj_t *tabview, uint16_t id, char *name)
+ */
+ 
+STATIC mp_obj_t mp_lv_tabview_set_tab_name(size_t mp_n_args, const mp_obj_t *mp_args)
+{
+    lv_obj_t *tabview = mp_to_lv(mp_args[0]);
+    uint16_t id = (uint16_t)mp_obj_get_int(mp_args[1]);
+    char *name = (char*)mp_obj_str_get_str(mp_args[2]);
+    lv_tabview_set_tab_name(tabview, id, name);
+    return mp_const_none;
+}
+
+STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_tabview_set_tab_name_obj, 3, mp_lv_tabview_set_tab_name, lv_tabview_set_tab_name);
+
+ 
+
+/*
+ * lvgl extension definition for:
  * void lv_tabview_set_anim_time(lv_obj_t *tabview, uint16_t anim_time)
  */
  
@@ -21456,6 +21479,7 @@ STATIC const mp_rom_map_elem_t tabview_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_add_tab), MP_ROM_PTR(&mp_lv_tabview_add_tab_obj) },
     { MP_ROM_QSTR(MP_QSTR_clean_tab), MP_ROM_PTR(&mp_lv_tabview_clean_tab_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_tab_act), MP_ROM_PTR(&mp_lv_tabview_set_tab_act_obj) },
+    { MP_ROM_QSTR(MP_QSTR_set_tab_name), MP_ROM_PTR(&mp_lv_tabview_set_tab_name_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_anim_time), MP_ROM_PTR(&mp_lv_tabview_set_anim_time_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_btns_pos), MP_ROM_PTR(&mp_lv_tabview_set_btns_pos_obj) },
     { MP_ROM_QSTR(MP_QSTR_get_tab_act), MP_ROM_PTR(&mp_lv_tabview_get_tab_act_obj) },
@@ -29700,7 +29724,7 @@ STATIC const mp_rom_map_elem_t mp_lv_disp_buf_t_locals_dict_table[] = {
 
 STATIC MP_DEFINE_CONST_DICT(mp_lv_disp_buf_t_locals_dict, mp_lv_disp_buf_t_locals_dict_table);
         
-/* Struct lv_task_t contains: [u'lv_task_del', u'lv_task_set_cb', u'lv_task_set_prio', u'lv_task_set_period', u'lv_task_ready', u'lv_task_set_repeat_count', u'lv_task_reset'] */
+/* Struct lv_task_t contains: [u'lv_task_del', u'lv_task_set_cb', u'lv_task_set_prio', u'lv_task_set_period', u'lv_task_ready', u'lv_task_set_repeat_count', u'lv_task_reset', u'lv_task_get_next'] */
 
 /*
  * lvgl extension definition for:
@@ -29833,6 +29857,22 @@ STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_task_reset_obj, 1, mp_lv_task_reset,
 
  
 
+/*
+ * lvgl extension definition for:
+ * lv_task_t *lv_task_get_next(lv_task_t *task)
+ */
+ 
+STATIC mp_obj_t mp_lv_task_get_next(size_t mp_n_args, const mp_obj_t *mp_args)
+{
+    lv_task_t *task = mp_write_ptr_lv_task_t(mp_args[0]);
+    lv_task_t * _res = lv_task_get_next(task);
+    return mp_read_ptr_lv_task_t((void*)_res);
+}
+
+STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_task_get_next_obj, 1, mp_lv_task_get_next, lv_task_get_next);
+
+ 
+
 STATIC const mp_rom_map_elem_t mp_lv_task_t_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_SIZE), MP_ROM_PTR(MP_ROM_INT(sizeof(lv_task_t))) },
     { MP_ROM_QSTR(MP_QSTR_cast), MP_ROM_PTR(&mp_lv_cast_class_method) },
@@ -29845,6 +29885,7 @@ STATIC const mp_rom_map_elem_t mp_lv_task_t_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_ready), MP_ROM_PTR(&mp_lv_task_ready_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_repeat_count), MP_ROM_PTR(&mp_lv_task_set_repeat_count_obj) },
     { MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&mp_lv_task_reset_obj) },
+    { MP_ROM_QSTR(MP_QSTR_get_next), MP_ROM_PTR(&mp_lv_task_get_next_obj) },
     
 };
 
@@ -32772,6 +32813,38 @@ STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_event_send_obj, 3, mp_lv_event_send,
  
 
 /*
+ * lvgl extension definition for:
+ * lv_res_t lv_event_send_refresh(lv_obj_t *obj)
+ */
+ 
+STATIC mp_obj_t mp_lv_event_send_refresh(size_t mp_n_args, const mp_obj_t *mp_args)
+{
+    lv_obj_t *obj = mp_to_lv(mp_args[0]);
+    lv_res_t _res = lv_event_send_refresh(obj);
+    return mp_obj_new_int_from_uint(_res);
+}
+
+STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_event_send_refresh_obj, 1, mp_lv_event_send_refresh, lv_event_send_refresh);
+
+ 
+
+/*
+ * lvgl extension definition for:
+ * void lv_event_send_refresh_recursive(lv_obj_t *obj)
+ */
+ 
+STATIC mp_obj_t mp_lv_event_send_refresh_recursive(size_t mp_n_args, const mp_obj_t *mp_args)
+{
+    lv_obj_t *obj = mp_to_lv(mp_args[0]);
+    lv_event_send_refresh_recursive(obj);
+    return mp_const_none;
+}
+
+STATIC MP_DEFINE_CONST_LV_FUN_OBJ_VAR(mp_lv_event_send_refresh_recursive_obj, 1, mp_lv_event_send_refresh_recursive, lv_event_send_refresh_recursive);
+
+ 
+
+/*
  * Function NOT generated:
  * Callback argument 'lv_event_cb_t event_xcb' cannot be the first argument! We assume the first argument contains the user_data
  * lv_event_cb_t event_xcb
@@ -33999,6 +34072,8 @@ STATIC const mp_rom_map_elem_t lvgl_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&mp_lv_init_obj) },
     { MP_ROM_QSTR(MP_QSTR_deinit), MP_ROM_PTR(&mp_lv_deinit_obj) },
     { MP_ROM_QSTR(MP_QSTR_event_send), MP_ROM_PTR(&mp_lv_event_send_obj) },
+    { MP_ROM_QSTR(MP_QSTR_event_send_refresh), MP_ROM_PTR(&mp_lv_event_send_refresh_obj) },
+    { MP_ROM_QSTR(MP_QSTR_event_send_refresh_recursive), MP_ROM_PTR(&mp_lv_event_send_refresh_recursive_obj) },
     { MP_ROM_QSTR(MP_QSTR_event_send_func), MP_ROM_PTR(&mp_lv_event_send_func_obj) },
     { MP_ROM_QSTR(MP_QSTR_event_get_data), MP_ROM_PTR(&mp_lv_event_get_data_obj) },
     { MP_ROM_QSTR(MP_QSTR_signal_send), MP_ROM_PTR(&mp_lv_signal_send_obj) },

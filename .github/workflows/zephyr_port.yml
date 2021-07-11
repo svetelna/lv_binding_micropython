@@ -1,0 +1,34 @@
+name: Build lv_micropython Zephyr port
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Zephyr
+      run: |
+        sudo apt install --no-install-recommends git cmake gperf ccache dfu-util wget python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file make gcc gcc-multilib g++-multilib libsdl2-dev
+        pip3 install west
+        west init  ~/zephyrproject
+        git -C ~/zephyrproject/zephyr checkout v2.5.0
+        cd ~/zephyrproject
+        west update
+        west zephyr-export
+    - name: Install Zephyr Toolchain
+      run: |
+        wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.12.4/zephyr-sdk-0.12.4-x86_64-linux-setup.run
+        chmod +x zephyr-sdk-0.12.4-x86_64-linux-setup.run
+        ./zephyr-sdk-0.12.4-x86_64-linux-setup.run -- -d ~/zephyr-sdk-0.12.4
+    - name: Clone lv_micropython
+      run: git clone https://github.com/lvgl/lv_micropython.git ~/zephyrproject/micropython
+    - name: Update submodules
+      run: git -C ~/zephyrproject/micropython/ submodule update --init --recursive
+    - name: Checkout lv_bindings
+      run: git -C ~/zephyrproject/micropython/lib/lv_bindings submodule update --init --recursive
+    - name: Build the Zephyr port
+      run: |
+        cd ~/zephyrproject/micropython/ports/zephyr/
+        make BOARD=mimxrt1050_evk
